@@ -1,5 +1,5 @@
 import streamlit as st
-import kagglehub
+import kaggle
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -76,4 +76,4 @@ user_input_sc_df = scaler.transform(user_input_df)
 predicted_charge = rf_best.predict(user_input_sc_df)
 
 # display the predicted price
-st.write(f'Predicted Insurance Charge for the given inputs of the person is: {predicted_charge[0]*100000}')
+st.write(f'Predicted Insurance Charge for the given inputs of the person is: {predicted_charge}')
