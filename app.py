@@ -27,11 +27,11 @@ categorical_features = ['sex', 'smoker', 'region'] # define categorical features
 df2 = pd.get_dummies(df, columns = categorical_features) # one-hot encode categorical features
 
 # split the data into input and output
-X = df2.drop('charges', axis=1) # input features
+X = df2.drop('charges', axis = 1) # input features
 y = df2['charges'] # target variable
 
 # split the data between train and test
-X_train, X_test, y_train, y_test = train_test_split(X,y, test_size = 0.2, random_state = 42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 42)
 
 # standardize the data
 scaler = StandardScaler()
@@ -56,11 +56,6 @@ r2_rf_best = r2_score(y_test, y_pred_rf_best)
 st.write(f'MAE Score : {mae_rf_best}')
 st.write(f'MSE Score: {mse_rf_best}')
 st.write(f'R2 Score: {r2_rf_best}')
-
-# Store original unique values for categorical features
-original_unique_values = {}
-for column in categorical_features:
-    original_unique_values[column] = df[column].unique()
 
 # prompt for user input
 st.write('Enter the input values for prediction:')
