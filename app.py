@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
@@ -16,7 +16,7 @@ from sklearn.model_selection import GridSearchCV
 df = pd.read_csv('insurance.csv')
 
 # TITLE OF THE APP
-st.title('Insurance Charge Prediction')
+st.title('Insurance Charges Prediction')
 
 # Data Overview
 st.header('Data Overview for First 10 Rows')
@@ -24,11 +24,11 @@ st.write(df.head(10))
 
 # one-hot encode data
 categorical_features = ['sex', 'smoker', 'region'] # define categorical features
-df = pd.get_dummies(df, columns = categorical_features) # one-hot encode categorical features
+df2 = pd.get_dummies(df, columns = categorical_features) # one-hot encode categorical features
 
 # split the data into input and output
-X = df.drop('charges', axis=1) # input features
-y = df['charges'] # target variable
+X = df2.drop('charges', axis=1) # input features
+y = df2['charges'] # target variable
 
 # split the data between train and test
 X_train, X_test, y_train, y_test = train_test_split(X,y, test_size = 0.2, random_state = 42)
@@ -39,7 +39,7 @@ X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
 # Model
-rf_best = RandomForestRegressor(max_depth = 5, min_samples_leaf = 4, n_estimators=200, random_state = 42)
+rf_best = RandomForestRegressor(max_depth = 5, min_samples_leaf = 4, n_estimators = 200, random_state = 42)
 
 # train the selected model
 rf_best.fit(X_train, y_train)
@@ -57,56 +57,56 @@ st.write(f'MAE Score : {mae_rf_best}')
 st.write(f'MSE Score: {mse_rf_best}')
 st.write(f'R2 Score: {r2_rf_best}')
 
+# Store original unique values for categorical features
+original_unique_values = {}
+for column in categorical_features:
+    original_unique_values[column] = df[column].unique()
+
 # prompt for user input
 st.write('Enter the input values for prediction:')
 
-#user_input = {}
-#for column in X.columns: # get columns from X
-#    user_input[column] = st.number_input(column, min_value = np.min(X[column]), max_value = np.max(X[column]), value = np.min(X[column]))
+user_input = {}
 
-user_input = []
+numerical_float = ['bmi']
+numerical_integer = ['age', 'children']
+categorical_features = ['sex', 'smoker', 'region']
 
-st.title("Input for Prediction")  # Add a title
-
-for column in X.columns:
-    if column in ['bmi']:  # float numerical feature
-        X[column] = pd.to_numeric(X[column], errors='coerce')
-        min_val = float(np.nanmin(X[column]))
-        max_val = float(np.nanmax(X[column]))
-        user_input[column] = st.number_input(
-            f"Enter a value for {column} (between {min_val:.0f} and {max_val:.0f}):",
-            min_value = min_val,
-            max_value = max_val,
-            value = min_val,  # Or another appropriate default value
+for column in numerical_float + numerical_integer + categorical_features:
+    if column in numerical_float:
+        user_input[column] = st.number_input(column,
+            min_value=np.min(X[column]),
+            max_value=np.max(X[column]),
+            value=float(np.min(X[column]))  # Convert to float
         )
-    elif column in ['age', 'children']:  # integer numerical features
-        X[column] = pd.to_numeric(X[column], errors='coerce')
-        min_val = int(np.nanmin(X[column]))
-        max_val = int(np.nanmax(X[column]))
+    elif column in numerical_integer:
         user_input[column] = st.number_input(
-            f"Enter a value for {column} (between {min_val:.2f} and {max_val:.2f}):",
-            min_value = min_val,
-            max_value = max_val,
-            value = min_val,  # Or another appropriate default value
-        )        
-    elif column in ['sex', 'smoker', 'region']:  # Categorical features
-        user_input[column] = st.selectbox(
-            f"Enter a value for {column}:",
-            options=X[column].unique(),
+            column,
+            min_value=int(np.min(X[column])),  # Convert to int
+            max_value=int(np.max(X[column])),  # Convert to int
+            value=int(np.min(X[column]))  # Convert to int
         )
-    else:
-        # Handle other columns if needed
-        pass
+    elif column in categorical_features:
+        user_input[column] = st.selectbox(column, df[column].unique())
 
-if st.button("Predict"):
-    # Create a DataFrame from the user input
-    user_input = pd.DataFrame([user_input])
+# convert user input to dataframe
+user_input_df = pd.DataFrame(user_input, index=[0])
 
-# standadrize the user input dataframe the same way we standardized our test dataframe
-user_input_sc_df = scaler.transform(user_input)
+# one-hot encode the user input dataframe
+user_input_encoded = pd.get_dummies(user_input_df, columns = categorical_features)
+
+# Get missing columns in the user input
+missing_cols = set(X.columns) - set(user_input_encoded.columns)
+# Add a missing column in user input with default value equal to 0
+for c in missing_cols:
+    user_input_encoded[c] = 0
+# Ensure the order of column in the test set
+user_input_encoded = user_input_encoded[X.columns]
+
+# standardize the user input dataframe the same way we standardized our test dataframe
+user_input_sc = scaler.transform(user_input_encoded)
 
 # predict the price
-predicted_charge = rf_best.predict(user_input_sc_df)
+predicted_charge = rf_best.predict(user_input_sc)
 
 # display the predicted price
-st.write(f'Predicted Insurance Charge for the given inputs of the person is: {predicted_charge}')
+st.write(f'Predicted Insurance Charge for the given inputs of the person is: {predicted_charge[0]}')
