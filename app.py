@@ -55,9 +55,9 @@ y_pred_rf_best = rf_best.predict(X_test)
 #r2_rf_best = r2_score(y_test, y_pred_rf_best)
 
 # Display the results
-st.write(f'MAE Score : {mae_rf_best}')
-st.write(f'MSE Score: {mse_rf_best}')
-st.write(f'R2 Score: {r2_rf_best}')
+#st.write(f'MAE Score : {mae_rf_best}')
+#st.write(f'MSE Score: {mse_rf_best}')
+#st.write(f'R2 Score: {r2_rf_best}')
 
 # prompt for user input
 st.write('Enter the input values for prediction:')
