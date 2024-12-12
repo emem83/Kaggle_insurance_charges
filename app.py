@@ -50,9 +50,9 @@ rf_best.fit(X_train, y_train)
 y_pred_rf_best = rf_best.predict(X_test)
 
 # Model evaluation
-mae_rf_best = mean_absolute_error(y_test, y_pred_rf_best)
-mse_rf_best = mean_squared_error(y_test, y_pred_rf_best)
-r2_rf_best = r2_score(y_test, y_pred_rf_best)
+#mae_rf_best = mean_absolute_error(y_test, y_pred_rf_best)
+#mse_rf_best = mean_squared_error(y_test, y_pred_rf_best)
+#r2_rf_best = r2_score(y_test, y_pred_rf_best)
 
 # Display the results
 st.write(f'MAE Score : {mae_rf_best}')
